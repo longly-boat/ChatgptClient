@@ -18,7 +18,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,5">
       <item>
-       <widget class="QListView" name="history_view">
+       <widget class="QListView" name="HistoryView">
         <property name="styleSheet">
          <string notr="true">background-color: rgb(44, 44, 44);</string>
         </property>
@@ -55,14 +55,14 @@
        </spacer>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="closeButton">
         <property name="text">
          <string>关闭</string>
         </property>
        </widget>
       </item>
       <item alignment="Qt::AlignRight">
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QPushButton" name="sendButton">
         <property name="text">
          <string>发送</string>
         </property>
@@ -96,5 +96,41 @@
   </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>sendButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>sendMessage()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1034</x>
+     <y>758</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1038</x>
+     <y>772</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>closeButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>926</x>
+     <y>766</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>928</x>
+     <y>775</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>sendMessage()</slot>
+ </slots>
 </ui>

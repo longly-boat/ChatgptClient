@@ -5,22 +5,18 @@ from PyQt5.QtWidgets import *
 from ChatgptClient import *
 
 
-def window():
-    app = QApplication(sys.argv)
-    w = QWidget()
-    b = QLabel(w)
-    b.setText("Hello World!")
-    w.setGeometry(100, 100, 200, 50)
-    b.move(50, 20)
-    w.setWindowTitle("PyQt5")
-    w.show()
-    sys.exit(app.exec_())
+class MyWindow(QMainWindow,Ui_MainWindow):
+    def __init__(self,parent=None):
+        super(MyWindow,self).__init__(parent)
+        self.setupUi(self)
+        self.setFixedSize(self.width(),self.height())
+
+    def sendMessage(self,string):
+        str=string
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = Ui_MainWindow()
-    w = QMainWindow()
-    ex.setupUi(w)
+    w = MyWindow()
     w.show()
     sys.exit(app.exec_())
