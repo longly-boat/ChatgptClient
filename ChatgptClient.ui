@@ -16,9 +16,9 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,5">
+     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,5">
       <item>
-       <widget class="QListView" name="HistoryView">
+       <widget class="QListWidget" name="HistoryView">
         <property name="styleSheet">
          <string notr="true">background-color: rgb(44, 44, 44);</string>
         </property>
@@ -27,7 +27,7 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout" stretch="3,1">
         <item>
-         <widget class="QListView" name="listView"/>
+         <widget class="QListWidget" name="listWidget"/>
         </item>
         <item>
          <widget class="QTextEdit" name="chatbox"/>
@@ -38,9 +38,6 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5"/>
-      </item>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
