@@ -3,7 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from ChatgptClient import *
-
+from settingpage import *
 class customQListWidgetItem(QListWidgetItem):
     def __init__(self, name):
         super().__init__()
@@ -30,6 +30,12 @@ class customQListWidgetItem(QListWidgetItem):
         # 设置自定义的QListWidgetItem的sizeHint，不然无法显示
         self.setSizeHint(self.widget.sizeHint())
 
+class settingDialog(QDialog,Ui_Dialog):
+    def __init__(self, parent=None):
+        super(settingDialog, self).__init__(parent)
+        self.setupUi(self)
+    def saveSetting(self):
+        self.close()
 
 class MyWindow(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
@@ -41,7 +47,7 @@ class MyWindow(QMainWindow,Ui_MainWindow):
         self.HistoryView.addItem(item1)
         self.HistoryView.setItemWidget(item1, item1.widget)
         self.HistoryView.itemClicked.connect(self.NewSession)
-        self.actionSetting.triggered.connect(self.Setting)
+
 
     def NewSession(self):
         self.chatlist.clear()
@@ -56,4 +62,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = MyWindow()
     w.show()
+    setting=settingDialog()
+    w.actionSetting.triggered.connect(setting.show)
     sys.exit(app.exec_())
