@@ -22,7 +22,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.HistoryView = QtWidgets.QListWidget(self.centralwidget)
-        self.HistoryView.setStyleSheet("background-color: rgb(44, 44, 44);")
+        self.HistoryView.setStyleSheet("background-color: rgb(49, 49, 49);\n"
+"")
         self.HistoryView.setObjectName("HistoryView")
         self.horizontalLayout_2.addWidget(self.HistoryView)
         self.verticalLayout = QtWidgets.QVBoxLayout()

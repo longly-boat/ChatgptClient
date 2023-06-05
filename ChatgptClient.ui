@@ -20,7 +20,8 @@
       <item>
        <widget class="QListWidget" name="HistoryView">
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(44, 44, 44);</string>
+         <string notr="true">background-color: rgb(49, 49, 49);
+</string>
         </property>
        </widget>
       </item>
