@@ -23,20 +23,31 @@ import os
 import pickle
 
 import openai
+import yaml
+
 os.environ["http_proxy"] = ""
 os.environ["https_proxy"] = ""
 openai.api_key=""
+model="gpt-3.5-turbo"
 originMessages = [{"role": "system", "content": "你是一个人工智能助手"}]
 def saveHistory(filename,message):
-    file=filename+".pickle"
+    file="history/"+filename+".pickle"
     with open(file, 'wb') as f:
         pickle.dump(message, f)
 
 def readHistory(filename):
-    file = filename + ".pickle"
+    file = "history/"+filename + ".pickle"
     with open(file, 'rb') as f:
         messages = pickle.load(f)
     return messages
+
+def getConfig():
+    if os.path.isfile("test-data")==True:
+        with open('Config.yaml', 'r') as f:
+            config = yaml.load(f, Loader=yaml.FullLoader)
+        os.environ["http_proxy"] = config['proxy']
+        os.environ["https_proxy"] = config['proxy']
+        openai.api_key=config["APIKEY"]
 
 
 

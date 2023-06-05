@@ -72,12 +72,12 @@
           <widget class="QComboBox" name="model">
            <item>
             <property name="text">
-             <string>GPT3.5</string>
+             <string>gpt-3.5-turbo</string>
             </property>
            </item>
            <item>
             <property name="text">
-             <string>GPT4</string>
+             <string>gpt-4</string>
             </property>
            </item>
           </widget>

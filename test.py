@@ -62,6 +62,11 @@ class MyWindow(QMainWindow,Ui_MainWindow):
         str=string
         self.chatbox.clear()
 
+    def changeSession(self,sessionName):
+        self.sessionName=sessionName
+        messages=readHistory(sessionName)
+
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
