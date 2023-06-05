@@ -15,7 +15,9 @@ class customQListWidgetItem(QListWidgetItem):
         # self.nameLabel.setStyleSheet("border:white 1px solid; color:white")
         self.nameLabel.setFrameShape(QtWidgets.QFrame.Box)
         self.nameLabel.setStyleSheet(
-            'border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;')
+             'QLabel{border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;}'
+             'QLabel:hover{border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;background-color:rgb(191,191,191);}'
+        )
         self.nameLabel.setFont(QFont("Ya hei",15))
         # 用来显示avator(图像)
         # 设置图像源 和 图像大小
@@ -34,11 +36,8 @@ class MyWindow(QMainWindow,Ui_MainWindow):
         super(MyWindow,self).__init__(parent)
         self.setupUi(self)
         self.setFixedSize(self.width(),self.height())
-
         width=self.HistoryView.widthMM()
-
         item1 = customQListWidgetItem("    ➕ 开启新对话   ")
-
         self.HistoryView.addItem(item1)
         self.HistoryView.setItemWidget(item1, item1.widget)
         #self.HistoryView.itemClicked.connect(lambda item: print(item.nameLabel.text()))
