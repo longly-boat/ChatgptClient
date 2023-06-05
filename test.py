@@ -40,10 +40,16 @@ class MyWindow(QMainWindow,Ui_MainWindow):
         item1 = customQListWidgetItem("    ➕ 开启新对话   ")
         self.HistoryView.addItem(item1)
         self.HistoryView.setItemWidget(item1, item1.widget)
-        #self.HistoryView.itemClicked.connect(lambda item: print(item.nameLabel.text()))
+        self.HistoryView.itemClicked.connect(self.NewSession)
+        self.actionSetting.triggered.connect(self.Setting)
+
+    def NewSession(self):
+        self.chatlist.clear()
+        self.chatbox.clear()
 
     def sendMessage(self,string):
         str=string
+        self.chatbox.clear()
 
 
 if __name__ == '__main__':
