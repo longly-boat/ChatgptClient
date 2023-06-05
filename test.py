@@ -37,7 +37,17 @@ class settingDialog(QDialog,Ui_Dialog):
         self.setupUi(self)
         self.setWindowTitle("设置")
     def saveSetting(self):
-        self.close()
+        key = self.APIKEY.text()
+        proxy = self.lineEdit.text()
+        index = self.model.currentIndex()
+        model = self.model.itemText(index)
+        config={
+            "APIKEY" : key,
+            "proxy":proxy,
+            "model":model,
+                }
+        with open('./Config.yml', 'w', encoding='utf-8') as f:
+            yaml.dump(data=config, stream=f, allow_unicode=True)
 
 class MyWindow(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
