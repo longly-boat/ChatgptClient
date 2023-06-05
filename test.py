@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from ChatgptClient import *
 from settingpage import *
+from chatgpt import *
 class customQListWidgetItem(QListWidgetItem):
     def __init__(self, name):
         super().__init__()
@@ -34,6 +35,7 @@ class settingDialog(QDialog,Ui_Dialog):
     def __init__(self, parent=None):
         super(settingDialog, self).__init__(parent)
         self.setupUi(self)
+        self.setWindowTitle("设置")
     def saveSetting(self):
         self.close()
 
@@ -41,17 +43,20 @@ class MyWindow(QMainWindow,Ui_MainWindow):
     def __init__(self,parent=None):
         super(MyWindow,self).__init__(parent)
         self.setupUi(self)
+        self.setWindowTitle("ChatGPT客户端")
         self.setFixedSize(self.width(),self.height())
         width=self.HistoryView.widthMM()
         item1 = customQListWidgetItem("    ➕ 开启新对话   ")
         self.HistoryView.addItem(item1)
         self.HistoryView.setItemWidget(item1, item1.widget)
         self.HistoryView.itemClicked.connect(self.NewSession)
+        self.sessionName=""
 
 
     def NewSession(self):
         self.chatlist.clear()
         self.chatbox.clear()
+        self.sessionName=""
 
     def sendMessage(self,string):
         str=string
