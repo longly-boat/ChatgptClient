@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import *
 from ChatgptClient import *
 from settingpage import *
 from chatgpt import *
+import markdown
 
 chatHistorys = {}
 
@@ -127,11 +128,20 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
 
     def updateChatlist(self, str):
-        message = QListWidgetItem()
-        message.setText(str)
+        # 解析的文本
+        markdown_text = str
+        text_edit1 = QTextEdit()
+        # 只读
+        text_edit1.setReadOnly(True)
 
-        self.chatlist.addItem(message)
+        # 解析markdown
+        html1 = markdown.markdown(markdown_text, extensions=['fenced_code'])
+        text_edit1.setHtml(html1)
+        item1 = QListWidgetItem()
 
+        item1.setSizeHint(text_edit1.sizeHint())  # 设置 QListWidgetItem 的大小
+        self.chatlist.addItem(item1)
+        self.chatlist.setItemWidget(item1, text_edit1)
 
     def changeSession(self, sessionName):
         self.sessionName = sessionName
