@@ -37,6 +37,7 @@ class customQListWidgetItem(QListWidgetItem):
 class ChatThread(QThread):
 
     end=pyqtSignal(str)
+    setName=pyqtSignal(str)
     sessionName=""
     str=""
     def __init__(self,parent=None):
@@ -56,6 +57,7 @@ class ChatThread(QThread):
             newchat, self.sessionName ,answer= getNewChat(self.str)
             chatHistorys[self.sessionName]=newchat
             self.end.emit(answer)
+            self.setName.emit(self.sessionName)
         else:
             chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
             answer=chat(chatHistorys[self.sessionName])
@@ -105,6 +107,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         getConfig()
         self.chatThread=ChatThread()
         self.chatThread.end.connect(self.updateChatlist)
+        self.chatThread.setName.connect(self.setSessionName)
 
     def NewSession(self):
         self.chatlist.clear()
@@ -119,6 +122,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.chatThread.setChat(self.sessionName,str)
         self.chatThread.start()
 
+    def setSessionName(self,sessionName):
+        self.sessionName=sessionName
 
 
     def updateChatlist(self, str):
