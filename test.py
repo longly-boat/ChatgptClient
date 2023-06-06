@@ -5,6 +5,10 @@ from PyQt5.QtWidgets import *
 from ChatgptClient import *
 from settingpage import *
 from chatgpt import *
+
+chatHistorys = {}
+
+
 class customQListWidgetItem(QListWidgetItem):
     def __init__(self, name):
         super().__init__()
@@ -16,13 +20,11 @@ class customQListWidgetItem(QListWidgetItem):
         # self.nameLabel.setStyleSheet("border:white 1px solid; color:white")
         self.nameLabel.setFrameShape(QtWidgets.QFrame.Box)
         self.nameLabel.setStyleSheet(
-             'QLabel{border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;}'
-             'QLabel:hover{border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;background-color:rgb(191,191,191);}'
+            'QLabel{border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;}'
+            'QLabel:hover{border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;background-color:rgb(191,191,191);}'
         )
-        self.nameLabel.setFont(QFont("Ya hei",15))
-        # 用来显示avator(图像)
-        # 设置图像源 和 图像大小
-        # 设置布局用来对nameLabel和avatorLabel进行布局
+        self.nameLabel.setFont(QFont("Ya hei", 15))
+
         self.hbox = QHBoxLayout()
         self.hbox.addWidget(self.nameLabel)
         self.hbox.addStretch(1)
@@ -31,7 +33,8 @@ class customQListWidgetItem(QListWidgetItem):
         # 设置自定义的QListWidgetItem的sizeHint，不然无法显示
         self.setSizeHint(self.widget.sizeHint())
 
-class settingDialog(QDialog,Ui_Dialog):
+
+class settingDialog(QDialog, Ui_Dialog):
     def __init__(self, parent=None):
         super(settingDialog, self).__init__(parent)
         self.setupUi(self)
@@ -47,50 +50,67 @@ class settingDialog(QDialog,Ui_Dialog):
         proxy = self.proxy.text()
         index = self.model.currentIndex()
         model = self.model.itemText(index)
-        config={
-            "APIKEY" : key,
-            "proxy":proxy,
-            "model":model,
-                }
+        config = {
+            "APIKEY": key,
+            "proxy": proxy,
+            "model": model,
+        }
         with open('./Config.yml', 'w', encoding='utf-8') as f:
             yaml.dump(data=config, stream=f, allow_unicode=True)
         self.close()
         getConfig()
 
 
-class MyWindow(QMainWindow,Ui_MainWindow):
-    def __init__(self,parent=None):
-        super(MyWindow,self).__init__(parent)
+class MyWindow(QMainWindow, Ui_MainWindow):
+    def __init__(self, parent=None):
+        super(MyWindow, self).__init__(parent)
         self.setupUi(self)
         self.setWindowTitle("ChatGPT客户端")
-        self.setFixedSize(self.width(),self.height())
-        width=self.HistoryView.widthMM()
+        # self.setFixedSize(self.width(),self.height())
+        width = self.HistoryView.widthMM()
         item1 = customQListWidgetItem("    ➕ 开启新对话   ")
         self.HistoryView.addItem(item1)
         self.HistoryView.setItemWidget(item1, item1.widget)
         self.HistoryView.itemClicked.connect(self.NewSession)
-        self.sessionName=""
-
+        self.sessionName = ""
+        getConfig()
 
     def NewSession(self):
         self.chatlist.clear()
         self.chatbox.clear()
-        self.sessionName=""
+        self.sessionName = ""
 
-    def sendMessage(self,string):
-        str=string
+    def sendMessage(self):
+        str = self.chatbox.toPlainText()
         self.chatbox.clear()
+        self.updateChatlist(str)
+        self.chatbox.update()
 
-    def changeSession(self,sessionName):
-        self.sessionName=sessionName
-        messages=readHistory(sessionName)
+        if self.sessionName == "":
+            newchat, self.sessionName ,answer= getNewChat(str)
+            chatHistorys[self.sessionName]=newchat
+            self.updateChatlist(answer)
 
+        else:
+            chatHistorys[self.sessionName].append({"role": "user", "content": str})
+            answer=chat(chatHistorys[self.sessionName])
+            self.updateChatlist(answer)
+
+    def updateChatlist(self, str):
+        message = QListWidgetItem()
+        message.setText(str)
+        self.chatlist.addItem(message)
+        self.chatlist.update()
+
+    def changeSession(self, sessionName):
+        self.sessionName = sessionName
+        messages = readHistory(sessionName)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = MyWindow()
     w.show()
-    setting=settingDialog()
+    setting = settingDialog()
     w.actionSetting.triggered.connect(setting.show)
     sys.exit(app.exec_())

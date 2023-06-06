@@ -19,6 +19,7 @@
 #
 #     print(messages)
 #     print(answer)
+import copy
 import os
 import pickle
 
@@ -49,5 +50,31 @@ def getConfig():
         os.environ["https_proxy"] = config['proxy']
         openai.api_key=config["APIKEY"]
 
+def chat(message):
+    completion = openai.ChatCompletion.create(
+             model=model,
+             temperature=0.8,
+             messages=message
+         )
+    answer = completion.choices[0].message['content']
+    message.append({"role":"assistant","content":answer})
+    return answer
 
+def getTitle(message):
+    newchat = copy.deepcopy(message)
+    newchat.append({"role": "user", "content": "给以上对话取一个短标题"})
+    title=chat(newchat)
+    return title
 
+def getNewChat(newchat):
+    messages = [{"role": "system", "content": "你是一个人工智能助手"}]
+    messages.append({"role": "user", "content": newchat})
+    title=getTitle(messages)
+    completion = openai.ChatCompletion.create(
+        model=model,
+        temperature=0.8,
+        messages=messages
+    )
+    answer = completion.choices[0].message['content']
+    messages.append({"role":"assistant","content":answer})
+    return messages,title,answer
