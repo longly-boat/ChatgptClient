@@ -80,7 +80,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.label.setText(_translate("Dialog", "APY KEY"))
+        self.label.setText(_translate("Dialog", "API KEY"))
         self.label_2.setText(_translate("Dialog", "代理设置"))
         self.label_3.setText(_translate("Dialog", "模型选择"))
         self.model.setItemText(0, _translate("Dialog", "gpt-3.5-turbo"))

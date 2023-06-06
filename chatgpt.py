@@ -42,7 +42,7 @@ def readHistory(filename):
     return messages
 
 def getConfig():
-    if os.path.isfile("test-data")==True:
+    if os.path.isfile("Config.yml")==True:
         with open('Config.yml', 'r') as f:
             config = yaml.load(f, Loader=yaml.FullLoader)
         os.environ["http_proxy"] = config['proxy']

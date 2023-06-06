@@ -28,7 +28,7 @@
               <string notr="true">font: 14pt ;</string>
              </property>
              <property name="text">
-              <string>APY KEY</string>
+              <string>API KEY</string>
              </property>
             </widget>
            </item>

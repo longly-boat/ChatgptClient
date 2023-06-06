@@ -36,6 +36,12 @@ class settingDialog(QDialog,Ui_Dialog):
         super(settingDialog, self).__init__(parent)
         self.setupUi(self)
         self.setWindowTitle("设置")
+        if os.path.isfile("Config.yml") == True:
+            with open('Config.yml', 'r') as f:
+                config = yaml.load(f, Loader=yaml.FullLoader)
+            self.proxy.setText(config['proxy'])
+            self.APIKEY.setText(config["APIKEY"])
+
     def saveSetting(self):
         key = self.APIKEY.text()
         proxy = self.proxy.text()
@@ -49,6 +55,7 @@ class settingDialog(QDialog,Ui_Dialog):
         with open('./Config.yml', 'w', encoding='utf-8') as f:
             yaml.dump(data=config, stream=f, allow_unicode=True)
         self.close()
+        getConfig()
 
 
 class MyWindow(QMainWindow,Ui_MainWindow):
