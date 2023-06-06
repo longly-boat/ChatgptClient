@@ -34,6 +34,35 @@ class customQListWidgetItem(QListWidgetItem):
         self.setSizeHint(self.widget.sizeHint())
 
 
+class ChatThread(QThread):
+
+    end=pyqtSignal(str)
+    sessionName=""
+    str=""
+    def __init__(self,parent=None):
+        super(ChatThread, self).__init__(parent)
+        self.count = 0
+
+    def setChat(self,sessionName,str):
+        self.sessionName=sessionName
+        self.str=str
+
+    def resetCount(self):
+        self.count = 0
+
+    def run(self):
+
+        if self.sessionName == "":
+            newchat, self.sessionName ,answer= getNewChat(self.str)
+            chatHistorys[self.sessionName]=newchat
+            self.end.emit(answer)
+        else:
+            chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
+            answer=chat(chatHistorys[self.sessionName])
+            self.end.emit(answer)
+
+
+
 class settingDialog(QDialog, Ui_Dialog):
     def __init__(self, parent=None):
         super(settingDialog, self).__init__(parent)
@@ -74,6 +103,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.HistoryView.itemClicked.connect(self.NewSession)
         self.sessionName = ""
         getConfig()
+        self.chatThread=ChatThread()
+        self.chatThread.end.connect(self.updateChatlist)
 
     def NewSession(self):
         self.chatlist.clear()
@@ -85,22 +116,17 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.chatbox.clear()
         self.updateChatlist(str)
         self.chatbox.update()
+        self.chatThread.setChat(self.sessionName,str)
+        self.chatThread.start()
 
-        if self.sessionName == "":
-            newchat, self.sessionName ,answer= getNewChat(str)
-            chatHistorys[self.sessionName]=newchat
-            self.updateChatlist(answer)
 
-        else:
-            chatHistorys[self.sessionName].append({"role": "user", "content": str})
-            answer=chat(chatHistorys[self.sessionName])
-            self.updateChatlist(answer)
 
     def updateChatlist(self, str):
         message = QListWidgetItem()
         message.setText(str)
+
         self.chatlist.addItem(message)
-        self.chatlist.update()
+
 
     def changeSession(self, sessionName):
         self.sessionName = sessionName
