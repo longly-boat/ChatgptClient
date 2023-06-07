@@ -63,6 +63,7 @@ class ChatThread(QThread):
             chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
             answer=chat(chatHistorys[self.sessionName])
             self.end.emit(answer)
+        saveHistory(self.sessionName, chatHistorys)
 
 
 
