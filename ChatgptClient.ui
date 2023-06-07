@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1065</width>
-    <height>803</height>
+    <width>724</width>
+    <height>596</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,6 +17,18 @@
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,5">
+      <property name="leftMargin">
+       <number>10</number>
+      </property>
+      <property name="topMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>10</number>
+      </property>
+      <property name="bottomMargin">
+       <number>5</number>
+      </property>
       <item>
        <widget class="QListWidget" name="HistoryView">
         <property name="styleSheet">
@@ -26,7 +38,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="verticalLayout" stretch="3,1">
+       <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0">
         <item>
          <widget class="QListWidget" name="chatlist"/>
         </item>
@@ -39,6 +51,12 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <property name="leftMargin">
+       <number>10</number>
+      </property>
+      <property name="rightMargin">
+       <number>10</number>
+      </property>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -75,8 +93,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1065</width>
-     <height>23</height>
+     <width>724</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
@@ -88,7 +106,14 @@
     </property>
     <addaction name="actionSetting"/>
    </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>新建...</string>
+    </property>
+    <addaction name="action"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionsetting">
@@ -99,6 +124,11 @@
   <action name="actionSetting">
    <property name="text">
     <string>打开设置页</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>聊天窗口</string>
    </property>
   </action>
  </widget>

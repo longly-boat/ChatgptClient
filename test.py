@@ -2,7 +2,8 @@ import sys
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from ChatgptClient import *
+from PyQt5 import uic
+# from ChatgptClient import *
 from settingpage import *
 from chatgpt import *
 import markdown
@@ -37,7 +38,7 @@ class customQListWidgetItem(QListWidgetItem):
 
 class ChatThread(QThread):
 
-    end=pyqtSignal(str)
+    end=pyqtSignal(str, bool)
     setName=pyqtSignal(str)
     sessionName=""
     str=""
@@ -57,12 +58,12 @@ class ChatThread(QThread):
         if self.sessionName == "":
             newchat, self.sessionName ,answer= getNewChat(self.str)
             chatHistorys[self.sessionName]=newchat
-            self.end.emit(answer)
+            self.end.emit(answer, False)
             self.setName.emit(self.sessionName)
         else:
             chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
             answer=chat(chatHistorys[self.sessionName])
-            self.end.emit(answer)
+            self.end.emit(answer, False)
 
 
 
@@ -76,6 +77,7 @@ class settingDialog(QDialog, Ui_Dialog):
                 config = yaml.load(f, Loader=yaml.FullLoader)
             self.proxy.setText(config['proxy'])
             self.APIKEY.setText(config["APIKEY"])
+
 
     def saveSetting(self):
         key = self.APIKEY.text()
@@ -99,14 +101,35 @@ class settingDialog(QDialog, Ui_Dialog):
             self.APIKEY.setText(config["APIKEY"])
         self.show()
 
-class MyWindow(QMainWindow, Ui_MainWindow):
+# 定义新聊天消息格式
+class ChatItem(QWidget):
+    def __init__(self, avatar, text, parent=None):
+        super(ChatItem, self).__init__(parent)
+        self.layout = QHBoxLayout(self)
+
+        self.avatarLabel = QLabel(self)
+        self.avatarLabel.setPixmap(QPixmap(avatar))
+
+        self.textLabel = QTextEdit()
+        # 只读
+        self.textLabel.setReadOnly(True)
+        # 解析markdown
+        html = markdown.markdown(text, extensions=['fenced_code'])
+        self.textLabel.setHtml(html)
+
+        self.layout.addWidget(self.avatarLabel)
+        self.layout.addWidget(self.textLabel)
+
+
+class MyWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
-        self.setupUi(self)
+        # 直接加载UI文件，不需要ChatgptClient.py文件了
+        self.ui = uic.loadUi("./ChatgptClient.ui", self)  # 加载UI文件
         self.setWindowTitle("ChatGPT客户端")
         # self.setFixedSize(self.width(),self.height())
         width = self.HistoryView.widthMM()
-        item1 = customQListWidgetItem("    ➕ 开启新对话   ")
+        item1 = customQListWidgetItem("➕开启新对话")
         self.HistoryView.addItem(item1)
         self.HistoryView.setItemWidget(item1, item1.widget)
         self.HistoryView.itemClicked.connect(self.NewSession)
@@ -137,32 +160,28 @@ class MyWindow(QMainWindow, Ui_MainWindow):
     def sendMessage(self):
         str = self.chatbox.toPlainText()
         self.chatbox.clear()
-        self.updateChatlist(str)
-        self.chatbox.update()
+        self.updateChatlist(str, True)
+       # self.chatbox.update()
         self.chatThread.setChat(self.sessionName,str)
         self.chatThread.start()
 
     def setSessionName(self,sessionName):
         self.sessionName=sessionName
 
+    def updateChatlist(self, str, is_user):
+        # 根据消息是来自用户还是GPT来设置不同的头像
+        avatar = "user.png" if is_user else "gpt.png"
 
-    def updateChatlist(self, str):
-        # 解析的文本
-        markdown_text = str
-        text_edit1 = QTextEdit()
-        # 只读
-        text_edit1.setReadOnly(True)
+        # 创建一个新的聊天项
+        chatItem = ChatItem(avatar, str)
+        item = QListWidgetItem()
+        item.setSizeHint(chatItem.sizeHint())
 
-        # 解析markdown
-        html1 = markdown.markdown(markdown_text, extensions=['fenced_code'])
-        text_edit1.setHtml(html1)
-        item1 = QListWidgetItem()
+        self.chatlist.addItem(item)
+        self.chatlist.setItemWidget(item, chatItem)
 
-        item1.setSizeHint(text_edit1.sizeHint())  # 设置 QListWidgetItem 的大小
-        self.chatlist.addItem(item1)
-        self.chatlist.setItemWidget(item1, text_edit1)
-        #添加自动滚动到下方
-        self.chatlist.setCurrentRow(self.chatlist.count()-1)
+        # 添加自动滚动到下方
+        self.chatlist.setCurrentRow(self.chatlist.count() - 1)
 
 
     def changeSession(self, sessionName):
@@ -173,7 +192,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     w = MyWindow()
-    w.show()
+    # 展示窗口
+    w.ui.show()
     setting = settingDialog()
     w.actionSetting.triggered.connect(setting.reshow)
     sys.exit(app.exec_())
