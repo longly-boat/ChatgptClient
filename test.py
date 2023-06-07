@@ -36,34 +36,44 @@ class customQListWidgetItem(QListWidgetItem):
 
 
 class ChatThread(QThread):
+    end = pyqtSignal(str)
+    setName = pyqtSignal(str)
+    sessionName = ""
+    str = ""
 
-    end=pyqtSignal(str)
-    setName=pyqtSignal(str)
-    sessionName=""
-    str=""
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super(ChatThread, self).__init__(parent)
-        self.count = 0
 
-    def setChat(self,sessionName,str):
-        self.sessionName=sessionName
-        self.str=str
-
-    def resetCount(self):
-        self.count = 0
+    def setChat(self, sessionName, str):
+        self.sessionName = sessionName
+        self.str = str
 
     def run(self):
 
         if self.sessionName == "":
-            newchat, self.sessionName ,answer= getNewChat(self.str)
-            chatHistorys[self.sessionName]=newchat
+            newchat, self.sessionName, answer = getNewChat(self.str)
+            chatHistorys[self.sessionName] = newchat
             self.end.emit(answer)
             self.setName.emit(self.sessionName)
         else:
             chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
-            answer=chat(chatHistorys[self.sessionName])
+            answer = chat(chatHistorys[self.sessionName])
             self.end.emit(answer)
 
+
+class SaveThread(QThread):
+    message = []
+    sessionname = ""
+
+    def __init__(self, parent=None):
+        super(SaveThread, self).__init__(parent)
+
+    def getSession(self, message, sessionName):
+        self.sessionname = sessionName
+        self.message = message
+
+    def run(self):
+        saveHistory(self.sessionname, self.message)
 
 
 class settingDialog(QDialog, Ui_Dialog):
@@ -91,6 +101,7 @@ class settingDialog(QDialog, Ui_Dialog):
             yaml.dump(data=config, stream=f, allow_unicode=True)
         self.close()
         getConfig()
+
     def reshow(self):
         if os.path.isfile("Config.yml") == True:
             with open('Config.yml', 'r') as f:
@@ -98,6 +109,7 @@ class settingDialog(QDialog, Ui_Dialog):
             self.proxy.setText(config['proxy'])
             self.APIKEY.setText(config["APIKEY"])
         self.show()
+
 
 class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -112,14 +124,16 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.HistoryView.itemClicked.connect(self.NewSession)
         self.sessionName = ""
         getConfig()
-        self.chatThread=ChatThread()
+        # 调用api线程
+        self.chatThread = ChatThread()
         self.chatThread.end.connect(self.updateChatlist)
         self.chatThread.setName.connect(self.setSessionName)
-
-        #回车发送文本
+        # 自动保存线程
+        self.saveThread = SaveThread()
+        # 回车发送文本
         self.chatbox.textChanged.connect(self.text_changed)
 
-    #回车发送文本
+    # 回车发送文本
     def text_changed(self):
         # 每当文本框内容发生改变一次，该方法即执行一次
         msg = self.chatbox.toPlainText()  # 首先在这里拿到文本框内容
@@ -139,12 +153,11 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.chatbox.clear()
         self.updateChatlist(str)
         self.chatbox.update()
-        self.chatThread.setChat(self.sessionName,str)
+        self.chatThread.setChat(self.sessionName, str)
         self.chatThread.start()
 
-    def setSessionName(self,sessionName):
-        self.sessionName=sessionName
-
+    def setSessionName(self, sessionName):
+        self.sessionName = sessionName
 
     def updateChatlist(self, str):
         # 解析的文本
@@ -161,9 +174,13 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         item1.setSizeHint(text_edit1.sizeHint())  # 设置 QListWidgetItem 的大小
         self.chatlist.addItem(item1)
         self.chatlist.setItemWidget(item1, text_edit1)
-        #添加自动滚动到下方
-        self.chatlist.setCurrentRow(self.chatlist.count()-1)
+        # 添加自动滚动到下方
+        self.chatlist.setCurrentRow(self.chatlist.count() - 1)
 
+        # 多线程自动保存会话
+        if self.sessionName != "":
+            self.saveThread.getSession(chatHistorys[self.sessionName], self.sessionName)
+            self.saveThread.start()
 
     def changeSession(self, sessionName):
         self.sessionName = sessionName

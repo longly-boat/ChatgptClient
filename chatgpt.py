@@ -34,6 +34,10 @@ model="gpt-3.5-turbo"
 originMessages = [{"role": "system", "content": "你是一个人工智能助手"}]
 def saveHistory(filename,message):
     file="history/"+filename+".pickle"
+    folder = os.path.exists("history")
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+        os.makedirs("history")  # makedirs 创建文件时如果路径不存在会创建这个路径
+
     with open(file, 'wb') as f:
         pickle.dump(message, f)
 
