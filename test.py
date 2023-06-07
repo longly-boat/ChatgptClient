@@ -110,6 +110,19 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.chatThread.end.connect(self.updateChatlist)
         self.chatThread.setName.connect(self.setSessionName)
 
+        #回车发送文本
+        self.chatbox.textChanged.connect(self.text_changed)
+
+    #回车发送文本
+    def text_changed(self):
+        # 每当文本框内容发生改变一次，该方法即执行一次
+        msg = self.chatbox.toPlainText()  # 首先在这里拿到文本框内容
+        if '\n' in msg:
+            # 做一个判断，textedit默认按回车换行，本质是在后面加了一个\n，那我们判断换行的根据就是判断\n是否在我那本框中，如果在，OK，那下一步
+            msg = msg.replace('\n', '')  # 将文本框的\n清除掉
+            self.chatbox.setText(msg)  # 将处理后的内容重新放入文本框
+            self.sendMessage()
+
     def NewSession(self):
         self.chatlist.clear()
         self.chatbox.clear()
