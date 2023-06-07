@@ -91,7 +91,13 @@ class settingDialog(QDialog, Ui_Dialog):
             yaml.dump(data=config, stream=f, allow_unicode=True)
         self.close()
         getConfig()
-
+    def reshow(self):
+        if os.path.isfile("Config.yml") == True:
+            with open('Config.yml', 'r') as f:
+                config = yaml.load(f, Loader=yaml.FullLoader)
+            self.proxy.setText(config['proxy'])
+            self.APIKEY.setText(config["APIKEY"])
+        self.show()
 
 class MyWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
@@ -155,6 +161,9 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         item1.setSizeHint(text_edit1.sizeHint())  # 设置 QListWidgetItem 的大小
         self.chatlist.addItem(item1)
         self.chatlist.setItemWidget(item1, text_edit1)
+        #添加自动滚动到下方
+        self.chatlist.setCurrentRow(self.chatlist.count()-1)
+
 
     def changeSession(self, sessionName):
         self.sessionName = sessionName
@@ -166,5 +175,5 @@ if __name__ == '__main__':
     w = MyWindow()
     w.show()
     setting = settingDialog()
-    w.actionSetting.triggered.connect(setting.show)
+    w.actionSetting.triggered.connect(setting.reshow)
     sys.exit(app.exec_())

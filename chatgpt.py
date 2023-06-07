@@ -22,6 +22,8 @@
 import copy
 import os
 import pickle
+
+import eventlet as eventlet
 import openai
 import yaml
 
@@ -51,16 +53,23 @@ def getConfig():
 
 def chat(message):
 
+    try:
+        with eventlet.Timeout(60):
+            completion = openai.ChatCompletion.create(
+                model=model,
+                temperature=0.8,
+                messages=message
+            )
+            answer = completion.choices[0].message['content']
+            message.append({"role": "assistant", "content": answer})
+            return answer
+    except :
+        answer="api调用失败，请检测网络代理或apikey配置是否正确"
+        return answer
 
-    completion = openai.ChatCompletion.create(
-             model=model,
-             temperature=0.8,
-             messages=message
-    )
 
-    answer = completion.choices[0].message['content']
-    message.append({"role":"assistant","content":answer})
-    return answer
+
+
 
 def getTitle(message):
     newchat = copy.deepcopy(message)
@@ -71,16 +80,21 @@ def getTitle(message):
 def getNewChat(newchat):
     messages = [{"role": "system", "content": "你是一个人工智能助手"}]
     messages.append({"role": "user", "content": newchat})
-    title=getTitle(messages)
 
-    completion = openai.ChatCompletion.create(
-            model=model,
-            temperature=0.8,
-            messages=messages
-    )
-    # answer="api调用失败，请检查网络代理配置"
 
-    answer = completion.choices[0].message['content']
+    try:
+        with eventlet.Timeout(90):
+            title = getTitle(messages)
+            completion = openai.ChatCompletion.create(
+                model=model,
+                temperature=0.8,
+                messages=messages
+            )
+            answer = completion.choices[0].message['content']
 
-    messages.append({"role":"assistant","content":answer})
-    return messages,title,answer
+            messages.append({"role": "assistant", "content": answer})
+            return messages, title, answer
+    except :
+        answer="api调用失败，请检测网络代理或apikey配置是否正确"
+        title="失败会话"
+        return messages, title, answer
