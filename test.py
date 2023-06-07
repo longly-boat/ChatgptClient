@@ -41,9 +41,10 @@ class ChatThread(QThread):
     setName=pyqtSignal(str)
     sessionName=""
     str=""
+
     def __init__(self,parent=None):
         super(ChatThread, self).__init__(parent)
-        self.count = 0
+        self.save = SaveHistory()
 
     def setChat(self,sessionName,str):
         self.sessionName=sessionName
@@ -57,14 +58,29 @@ class ChatThread(QThread):
         if self.sessionName == "":
             newchat, self.sessionName ,answer= getNewChat(self.str)
             chatHistorys[self.sessionName]=newchat
+            self.save.getSessionName(chatHistorys[self.sessionName], self.sessionName)
+            self.save.run()
             self.end.emit(answer)
             self.setName.emit(self.sessionName)
         else:
             chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
             answer=chat(chatHistorys[self.sessionName])
             self.end.emit(answer)
-        saveHistory(self.sessionName, chatHistorys)
 
+
+class SaveHistory(QThread):
+    sessionName1 = ""
+    message = []
+
+    def __init__(self, parent=None):
+        super(SaveHistory, self).__init__(parent)
+
+    def getSessionName(self, message, sessionName):
+        self.message = message
+        self.sessionName1 = sessionName
+
+    def run(self):
+        saveHistory(self.sessionName1, self.message)
 
 
 class settingDialog(QDialog, Ui_Dialog):
@@ -116,7 +132,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.chatThread=ChatThread()
         self.chatThread.end.connect(self.updateChatlist)
         self.chatThread.setName.connect(self.setSessionName)
-
         #回车发送文本
         self.chatbox.textChanged.connect(self.text_changed)
 
@@ -164,7 +179,6 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         self.chatlist.setItemWidget(item1, text_edit1)
         #添加自动滚动到下方
         self.chatlist.setCurrentRow(self.chatlist.count()-1)
-
 
     def changeSession(self, sessionName):
         self.sessionName = sessionName
