@@ -135,6 +135,7 @@ class ChatItem(QWidget):
 
 
 class MyWindow(QMainWindow):
+    window=[]
     def __init__(self, parent=None):
         super(MyWindow, self).__init__(parent)
         # 直接加载UI文件，不需要ChatgptClient.py文件了
@@ -191,6 +192,7 @@ class MyWindow(QMainWindow):
 
     def newWindow(self):
         new_window = MyWindow()
+        self.window.append(new_window)
         new_window.chatThread.setChatHistorys(new_window.chatHistorys)
         new_window.show()
 
