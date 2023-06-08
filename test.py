@@ -33,15 +33,13 @@ class customQListWidgetItem(QListWidgetItem):
         # 设置自定义的QListWidgetItem的sizeHint，不然无法显示
         self.setSizeHint(self.widget.sizeHint())
 
-
 class ChatThread(QThread):
     end=pyqtSignal(str, bool)
-    setName=pyqtSignal(str)
+    setName=pyqtSignal(str,list)
     sessionName=""
     str=""
     def __init__(self,parent=None):
         super(ChatThread, self).__init__(parent)
-        self.count = 0
 
     def setChat(self,sessionName,str,chatHistorys):
         self.sessionName=sessionName
@@ -60,7 +58,7 @@ class ChatThread(QThread):
             newchat, self.sessionName ,answer= getNewChat(self.str)
             self.chatHistorys[self.sessionName]=newchat
             self.end.emit(answer, False)
-            self.setName.emit(self.sessionName)
+            self.setName.emit(self.sessionName,newchat)
         else:
             self.chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
             answer=chat(self.chatHistorys[self.sessionName])
@@ -185,8 +183,11 @@ class MyWindow(QMainWindow):
         self.chatThread.setChat(self.sessionName,str, self.chatHistorys)
         self.chatThread.start()
 
-    def setSessionName(self,sessionName):
+    def setSessionName(self,sessionName,session):
         self.sessionName=sessionName
+        self.chatHistorys[self.sessionName]=session
+        saveHistory(sessionName,session)
+
 
     def newWindow(self):
         new_window = MyWindow()
@@ -222,3 +223,4 @@ if __name__ == '__main__':
     # 展示窗口
     w.ui.show()
     sys.exit(app.exec_())
+
