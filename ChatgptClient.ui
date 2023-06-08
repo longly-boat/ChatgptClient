@@ -43,7 +43,17 @@
          <widget class="QListWidget" name="chatlist"/>
         </item>
         <item>
-         <widget class="QTextEdit" name="chatbox"/>
+         <widget class="QTextEdit" name="chatbox">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>95</height>
+           </size>
+          </property>
+          <property name="placeholderText">
+           <string>Hello, user! How can I help you today?</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -110,7 +120,7 @@
     <property name="title">
      <string>新建...</string>
     </property>
-    <addaction name="action"/>
+    <addaction name="newChatWindow"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -126,7 +136,7 @@
     <string>打开设置页</string>
    </property>
   </action>
-  <action name="action">
+  <action name="newChatWindow">
    <property name="text">
     <string>聊天窗口</string>
    </property>

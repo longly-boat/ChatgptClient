@@ -8,8 +8,6 @@ from settingpage import *
 from chatgpt import *
 import markdown
 
-chatHistorys = {}
-
 
 class customQListWidgetItem(QListWidgetItem):
     def __init__(self, name):
@@ -37,7 +35,6 @@ class customQListWidgetItem(QListWidgetItem):
 
 
 class ChatThread(QThread):
-
     end=pyqtSignal(str, bool)
     setName=pyqtSignal(str)
     sessionName=""
@@ -46,24 +43,30 @@ class ChatThread(QThread):
         super(ChatThread, self).__init__(parent)
         self.count = 0
 
-    def setChat(self,sessionName,str):
+    def setChat(self,sessionName,str,chatHistorys):
         self.sessionName=sessionName
         self.str=str
+        self.chatHistorys = chatHistorys
 
     def resetCount(self):
         self.count = 0
+
+    def setChatHistorys(self, chatHistorys):
+        self.chatHistorys = chatHistorys
 
     def run(self):
 
         if self.sessionName == "":
             newchat, self.sessionName ,answer= getNewChat(self.str)
-            chatHistorys[self.sessionName]=newchat
+            self.chatHistorys[self.sessionName]=newchat
             self.end.emit(answer, False)
             self.setName.emit(self.sessionName)
+            saveHistory(self.sessionName, answer)
         else:
-            chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
-            answer=chat(chatHistorys[self.sessionName])
+            self.chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
+            answer=chat(self.chatHistorys[self.sessionName])
             self.end.emit(answer, False)
+            saveHistory(self.sessionName, answer)
 
 
 
@@ -138,6 +141,12 @@ class MyWindow(QMainWindow):
         self.chatThread=ChatThread()
         self.chatThread.end.connect(self.updateChatlist)
         self.chatThread.setName.connect(self.setSessionName)
+        self.newChatWindow.triggered.connect(self.newWindow)
+        # 在每个窗口中创建一个新的settingDialog实例
+        self.setting = settingDialog()
+        self.actionSetting.triggered.connect(self.setting.reshow)
+
+        self.chatHistorys = {}  # 创建一个新的chatHistorys字典
 
         #回车发送文本
         self.chatbox.textChanged.connect(self.text_changed)
@@ -161,12 +170,16 @@ class MyWindow(QMainWindow):
         str = self.chatbox.toPlainText()
         self.chatbox.clear()
         self.updateChatlist(str, True)
-       # self.chatbox.update()
-        self.chatThread.setChat(self.sessionName,str)
+        self.chatThread.setChat(self.sessionName,str, self.chatHistorys)
         self.chatThread.start()
 
     def setSessionName(self,sessionName):
         self.sessionName=sessionName
+
+    def newWindow(self):
+        new_window = MyWindow()
+        new_window.chatThread.setChatHistorys(new_window.chatHistorys)
+        new_window.show()
 
     def updateChatlist(self, str, is_user):
         # 根据消息是来自用户还是GPT来设置不同的头像
@@ -194,6 +207,4 @@ if __name__ == '__main__':
     w = MyWindow()
     # 展示窗口
     w.ui.show()
-    setting = settingDialog()
-    w.actionSetting.triggered.connect(setting.reshow)
     sys.exit(app.exec_())
