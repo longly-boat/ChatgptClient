@@ -61,13 +61,25 @@ class ChatThread(QThread):
             self.chatHistorys[self.sessionName]=newchat
             self.end.emit(answer, False)
             self.setName.emit(self.sessionName)
-            saveHistory(self.sessionName, answer)
         else:
             self.chatHistorys[self.sessionName].append({"role": "user", "content": self.str})
             answer=chat(self.chatHistorys[self.sessionName])
             self.end.emit(answer, False)
-            saveHistory(self.sessionName, answer)
 
+
+class SaveHistory(QThread):
+    sessionName1 = ""
+    message = []
+
+    def __init__(self, parent=None):
+        super(SaveHistory, self).__init__(parent)
+
+    def getSessionName(self, message, sessionName):
+        self.message = message
+        self.sessionName1 = sessionName
+
+    def run(self):
+        saveHistory(self.sessionName1, self.message)
 
 
 class settingDialog(QDialog, Ui_Dialog):
@@ -76,7 +88,7 @@ class settingDialog(QDialog, Ui_Dialog):
         self.setupUi(self)
         self.setWindowTitle("设置")
         if os.path.isfile("Config.yml") == True:
-            with open('Config.yml', 'r') as f:
+            with open('Config.yml', 'rb') as f:
                 config = yaml.load(f, Loader=yaml.FullLoader)
             self.proxy.setText(config['proxy'])
             self.APIKEY.setText(config["APIKEY"])
@@ -98,7 +110,7 @@ class settingDialog(QDialog, Ui_Dialog):
         getConfig()
     def reshow(self):
         if os.path.isfile("Config.yml") == True:
-            with open('Config.yml', 'r') as f:
+            with open('Config.yml', 'rb') as f:
                 config = yaml.load(f, Loader=yaml.FullLoader)
             self.proxy.setText(config['proxy'])
             self.APIKEY.setText(config["APIKEY"])
@@ -145,7 +157,7 @@ class MyWindow(QMainWindow):
         # 在每个窗口中创建一个新的settingDialog实例
         self.setting = settingDialog()
         self.actionSetting.triggered.connect(self.setting.reshow)
-
+        self.save = SaveHistory()
         self.chatHistorys = {}  # 创建一个新的chatHistorys字典
 
         #回车发送文本
@@ -195,7 +207,9 @@ class MyWindow(QMainWindow):
 
         # 添加自动滚动到下方
         self.chatlist.setCurrentRow(self.chatlist.count() - 1)
-
+        if self.sessionName != "":
+            self.save.getSessionName(self.chatHistorys[self.sessionName], self.sessionName)
+            self.save.start()
 
     def changeSession(self, sessionName):
         self.sessionName = sessionName
