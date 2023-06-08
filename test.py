@@ -33,6 +33,29 @@ class customQListWidgetItem(QListWidgetItem):
         self.widget.setLayout(self.hbox)
         # 设置自定义的QListWidgetItem的sizeHint，不然无法显示
         self.setSizeHint(self.widget.sizeHint())
+class messageQListWidgetItem(QListWidgetItem):
+    def __init__(self, name):
+        super().__init__()
+        # 自定义item中的widget 用来显示自定义的内容
+        self.widget = QWidget()
+        # 用来显示name
+        self.nameLabel = QLabel()
+        self.nameLabel.setText(name)
+        # self.nameLabel.setStyleSheet("border:white 1px solid; color:white")
+        self.nameLabel.setFrameShape(QtWidgets.QFrame.Box)
+        self.nameLabel.setStyleSheet(
+            'QLabel{border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;}'
+            'QLabel:hover{border-width: 3px;border-style: solid;border-radius: 8px; color:white;border-color: gray;background-color:rgb(191,191,191);}'
+        )
+        self.nameLabel.setFont(QFont("Ya hei", 15))
+
+        self.hbox = QHBoxLayout()
+        self.hbox.addWidget(self.nameLabel)
+        self.hbox.addStretch(1)
+        # 设置widget的布局
+        self.widget.setLayout(self.hbox)
+        # 设置自定义的QListWidgetItem的sizeHint，不然无法显示
+        self.setSizeHint(self.widget.sizeHint())
 
 
 class ChatThread(QThread):
@@ -133,6 +156,7 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         # 回车发送文本
         self.chatbox.textChanged.connect(self.text_changed)
 
+
     # 回车发送文本
     def text_changed(self):
         # 每当文本框内容发生改变一次，该方法即执行一次
@@ -150,6 +174,8 @@ class MyWindow(QMainWindow, Ui_MainWindow):
 
     def sendMessage(self):
         str = self.chatbox.toPlainText()
+        if str =="":
+            return
         self.chatbox.clear()
         self.updateChatlist(str)
         self.chatbox.update()
@@ -169,11 +195,14 @@ class MyWindow(QMainWindow, Ui_MainWindow):
         # 解析markdown
         html1 = markdown.markdown(markdown_text, extensions=['fenced_code'])
         text_edit1.setHtml(html1)
+        text_edit1.adjustSize()
         item1 = QListWidgetItem()
 
-        item1.setSizeHint(text_edit1.sizeHint())  # 设置 QListWidgetItem 的大小
+        #item1.setSizeHint(text_edit1.sizeHint())  # 设置 QListWidgetItem 的大小
+        item1.setSizeHint(QSize(0, 145))
         self.chatlist.addItem(item1)
         self.chatlist.setItemWidget(item1, text_edit1)
+
         # 添加自动滚动到下方
         self.chatlist.setCurrentRow(self.chatlist.count() - 1)
 
@@ -194,3 +223,5 @@ if __name__ == '__main__':
     setting = settingDialog()
     w.actionSetting.triggered.connect(setting.reshow)
     sys.exit(app.exec_())
+
+
