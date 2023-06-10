@@ -4,24 +4,24 @@ altgraph==0.17.3
 async-timeout==4.0.2
 attrs==23.1.0
 certifi==2023.5.7
-cffi @ file:///C:/b/abs_49n3v2hyhr/croot/cffi_1670423218144/work
+cffi 
 charset-normalizer==3.1.0
 click==8.1.3
 colorama==0.4.6
-cryptography @ file:///C:/b/abs_8ecplyc3n2/croot/cryptography_1677533105000/work
-dnspython @ file:///C:/Windows/TEMP/abs_d0hd29ovib/croots/recipe/dnspython_1659712642313/work
-eventlet @ file:///C:/Windows/TEMP/abs_6582zqi5cx/croots/recipe/eventlet_1659714580187/work
+cryptography 
+dnspython
+eventlet 
 frozenlist==1.3.3
-greenlet @ file:///C:/b/abs_47lk_w2ajq/croot/greenlet_1670513248400/work
-idna @ file:///C:/b/abs_bdhbebrioa/croot/idna_1666125572046/work
-Markdown @ file:///C:/b/abs_98lv_ucina/croot/markdown_1671541919225/work
+greenlet
+idna 
+Markdown 
 multidict==6.0.4
 openai==0.27.7
 pefile==2023.2.7
-pycparser @ file:///tmp/build/80754af9/pycparser_1636541352034/work
+pycparser 
 pyinstaller==5.12.0
 pyinstaller-hooks-contrib==2023.3
-pyOpenSSL @ file:///C:/b/abs_552w85x1jz/croot/pyopenssl_1677607703691/work
+pyOpenSSL 
 PyQt5==5.15.9
 pyqt5-plugins==5.15.9.2.3
 PyQt5-Qt5==5.15.2
@@ -33,7 +33,7 @@ PyYAML==6.0
 qt5-applications==5.15.2.2.3
 qt5-tools==5.15.2.1.3
 requests==2.31.0
-six @ file:///tmp/build/80754af9/six_1644875935023/work
+six 
 tqdm==4.65.0
 urllib3==2.0.2
 yarl==1.9.2
