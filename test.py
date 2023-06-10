@@ -9,6 +9,7 @@ from chatgpt import *
 import markdown
 
 
+
 class customQListWidgetItem(QListWidgetItem):
     def __init__(self, name):
         super().__init__()
